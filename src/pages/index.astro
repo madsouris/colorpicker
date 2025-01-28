@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+import colors from '../assets/data.json'
+
+
+// Optional: Define a type for the color data (if using TypeScript)
+type ColorFamily = {
+  [key: string]: string;
+};
+
+type Colors = {
+  [key: string]: ColorFamily;
+};
+
+const colorData: Colors = colors;
+
+
+---
+
+<Layout>
+	<div class="container mx-auto py-8 px-4">
+		<header class="flex flex-col gap-4 items-center text-center mb-8">
+			<a href="/">
+				<img src="/favicon.svg" alt="logo">
+			</a>
+			<h1 class="font-extrabold tracking-tight text-3xl text-zinc-800">
+				Color Picker
+			</h1>
+			<p class="font-mono font-light tracking-tight text-sm text-zinc-500">
+				These colors are from the old <a class="underline italic" href="//web.archive.org/web/20140701012736/ttps://www.google.com/design/spec/style/color.html" target="_blank">Google Material Design Color Guideline 🔗</a>. <br>
+Click to copy the HEX code.
+			</p>
+		</header>
+		<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+
+			<!-- Loop through each color family -->
+			{Object.entries(colorData).map(([familyName, familyColors]) => (
+			<div>
+				<h2 class=" font-bold mb-4 uppercase text-zinc-600 font-mono">{familyName}</h2>
+				<!-- Loop through each color in the family -->
+				{Object.entries(familyColors).map(([key, hex]) => (
+				<div style={`background-color: ${hex};`}
+					class=" text-white p-2 inline-flex justify-between items-center w-full cursor-pointer"
+					x-data={`{ hex: '${hex}', copied: false }`}
+        			@click="navigator.clipboard.writeText(hex); copied = true; setTimeout(() => copied = false, 1000)"
+				>
+					<div class="flex flex-col gap-0">
+					<p class="font-medium text-xs drop-shadow-sm">{key}</p>
+					<p class="font-mono font-bold drop-shadow">{hex}</p>
+					</div>
+					<span class="text-xs font-mono uppercase" x-text="copied ? 'Copied' : 'Copy'"></span>
+				</div>
+				))}
+			</div>
+			))}
+		</section>
+	</div>
+</Layout>
