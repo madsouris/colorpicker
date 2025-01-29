@@ -15,5 +15,11 @@
     "alpinejs": "^3.14.8",
     "astro": "^5.1.10",
     "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@vite-pwa/astro": "^0.5.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "vite-plugin-pwa": "^0.21.1"
   }
 }

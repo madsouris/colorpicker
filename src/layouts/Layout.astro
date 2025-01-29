@@ -1,22 +1,56 @@
+---
+import { pwaInfo } from "virtual:pwa-info";
+---
+
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Color Picker</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" sizes="180x180" />
+    <link rel="mask-icon" href="/favicon.svg" color="#FFFFFF" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Color Picker</title>
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="title" content="Color Picker by @madsouris" />
+    <meta
+      name="description"
+      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://color.vannrith.com/" />
+    <meta property="og:title" content="Color Picker by @madsouris" />
+    <meta
+      property="og:description"
+      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
+    />
+    <meta property="og:image" content="/color.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://color.vannrith.com/" />
+    <meta property="twitter:title" content="Color Picker by @madsouris" />
+    <meta
+      property="twitter:description"
+      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
+    />
+    <meta property="twitter:image" content="/color.png" />
+
+    {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+  body,
+  html {
+    background: url("/bg.svg");
+    background-size: cover;
+    background-attachment: fixed;
+  }
 </style>
