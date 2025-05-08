@@ -1,25 +1,18 @@
 {
-  "name": "",
+  "name": "astro",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --port 1996",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --port 1996",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/alpinejs": "^0.4.3",
-    "@astrojs/tailwind": "^5.1.5",
-    "@types/alpinejs": "^3.13.11",
-    "alpinejs": "^3.14.8",
-    "astro": "^5.1.10",
-    "tailwindcss": "^3.4.17"
-  },
-  "devDependencies": {
-    "@vite-pwa/astro": "^0.5.0",
-    "prettier": "^3.4.2",
-    "prettier-plugin-astro": "^0.14.1",
-    "vite-plugin-pwa": "^0.21.1"
+    "@astrojs/vue": "^5.0.13",
+    "@tailwindcss/vite": "^4.1.5",
+    "astro": "^5.7.11",
+    "tailwindcss": "^4.1.5",
+    "vue": "^3.5.13"
   }
 }
