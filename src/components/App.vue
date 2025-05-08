@@ -30,16 +30,23 @@
                     <div class="flex flex-wrap gap-2 items-center">
                         <div class="flex flex-col">
                             <label for="baseColorInput" class="text-xs text-slate-600 mb-1">Starting point</label>
-                            <input id="baseColorInput" type="color" v-model="baseHexColor"
-                                class="form-input w-28 h-9 p-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent cursor-pointer" />
+                            <div
+                                class="flex items-center form-input w-auto h-9 px-3 py-2 border border-slate-300 rounded-md shadow-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent cursor-pointer">
+                                <span class="font-mono text-sm mr-2">{{ baseHexColor }}</span>
+                                <input id="baseColorInput" type="color" v-model="baseHexColor"
+                                    class="w-6 h-6 border-0 p-0 m-0 cursor-pointer" />
+                            </div>
                         </div>
-                        <select v-model="selectedFormula"
-                            class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
-                            <option value="monochromatic">Monochromatic</option>
-                            <option value="analogous" disabled>Analogous</option>
-                            <option value="complementary" disabled>Complementary</option>
-                            <option value="triadic" disabled>Triadic</option>
-                        </select>
+                        <div class="flex flex-col">
+                            <label for="formulaSelect" class="text-xs text-slate-600 mb-1">Color formula</label>
+                            <select id="formulaSelect" v-model="selectedFormula"
+                                class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
+                                <option value="monochromatic">Monochromatic</option>
+                                <option value="analogous" disabled>Analogous</option>
+                                <option value="complementary" disabled>Complementary</option>
+                                <option value="triadic" disabled>Triadic</option>
+                            </select>
+                        </div>
                         <button @click="regeneratePalette(true)"
                             class="bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
