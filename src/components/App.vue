@@ -30,12 +30,8 @@
                     <div class="flex flex-wrap gap-2 items-center">
                         <div class="flex flex-col">
                             <label for="baseColorInput" class="text-xs text-slate-600 mb-1">Starting point</label>
-                            <input 
-                                id="baseColorInput"
-                                type="color" 
-                                v-model="baseHexColor" 
-                                class="form-input w-28 h-9 p-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent cursor-pointer" 
-                            />
+                            <input id="baseColorInput" type="color" v-model="baseHexColor"
+                                class="form-input w-28 h-9 p-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent cursor-pointer" />
                         </div>
                         <select v-model="selectedFormula"
                             class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
@@ -75,18 +71,7 @@
             <div v-if="palette.length > 0" v-for="(color, index) in palette" :key="index"
                 :style="{ backgroundColor: color.hex, color: getContrastingTextColor(color.hex) }"
                 class="flex flex-col justify-center items-center text-center p-4 relative">
-                <!-- Lock toggle button for the first color -->
-                <button v-if="index === 0" 
-                    @click="toggleLockFirstColor" 
-                    class="absolute top-2 right-2 p-1 rounded-full bg-white/30 hover:bg-white/50 transition-colors"
-                    :title="isFirstColorLocked ? 'Unlock color' : 'Lock color'">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            :d="isFirstColorLocked 
-                                ? 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' 
-                                : 'M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z'" />
-                    </svg>
-                </button>
+
                 <p class="font-mono font-bold text-sm sm:text-base">{{ color.hex }}</p>
                 <p class="font-mono text-xs sm:text-sm">{{ color.rgb }}</p>
             </div>
@@ -100,77 +85,31 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import WelcomeModal from './WelcomeModal.vue';
-import { generatePalette, getContrastingTextColor, hexToRgb, rgbToHsl } from '../logic/colorGenerator.js';
+import { generatePalette, getContrastingTextColor } from '../logic/colorGenerator.js';
 
 const isWelcomeVisible = ref(true);
 const palette = ref([]);
-const baseHexColor = ref(''); // For the color input
+const baseHexColor = ref('');
 const selectedFormula = ref('random');
-const isFirstColorLocked = ref(false);
-const isProgrammaticUpdate = ref(false); // Add this flag to track programmatic updates
-
 const handleStart = () => {
     isWelcomeVisible.value = false;
 };
 
-// Toggle lock state for the first color
-const toggleLockFirstColor = () => {
-    isFirstColorLocked.value = !isFirstColorLocked.value;
-    
-    // If we're locking the color, make sure baseHexColor matches the first color
-    if (isFirstColorLocked.value && palette.value.length > 0) {
-        isProgrammaticUpdate.value = true; // Set flag before updating
-        baseHexColor.value = palette.value[0].hex;
-        isProgrammaticUpdate.value = false; // Reset flag after updating
-    }
-};
-
 const regeneratePalette = () => {
-    let baseColorForGenerator = null;
-    
-    // If first color is locked and we have a valid hex, use it
-    if (isFirstColorLocked.value && baseHexColor.value && /^#[0-9A-F]{6}$/i.test(baseHexColor.value)) {
-        const rgb = hexToRgb(baseHexColor.value);
-        if (rgb) {
-            baseColorForGenerator = rgb;
-        }
-    } 
-    // Otherwise, generate a completely new palette (including first color)
-    
-    // Generate the palette
-    palette.value = generatePalette(selectedFormula.value, baseColorForGenerator);
-    
-    // Update the baseHexColor with the first color from the palette
-    // Do this regardless of lock state to keep the input in sync
+    palette.value = generatePalette(selectedFormula.value);
+
     if (palette.value.length > 0) {
-        isProgrammaticUpdate.value = true; // Set flag before updating
         baseHexColor.value = palette.value[0].hex;
-        isProgrammaticUpdate.value = false; // Reset flag after updating
     }
-    
-    console.log('Generated Palette:', palette.value, 'with formula:', selectedFormula.value, 'and base hex:', baseHexColor.value, 'locked:', isFirstColorLocked.value);
 };
 
-// Watch for changes to baseHexColor when manually edited
-watch(baseHexColor, (newValue, oldValue) => {
-    if (isProgrammaticUpdate.value) {
-        // Skip processing if this is a programmatic update
-        return;
-    }
-    
+watch(baseHexColor, (newValue) => {
     if (newValue && /^#[0-9A-F]{6}$/i.test(newValue)) {
-        // Only regenerate if the value actually changed
-        if (newValue !== oldValue) {
-            // If the user manually changes the color input, lock the first color
-            isFirstColorLocked.value = true;
-            // Regenerate the palette with the new color
-            regeneratePalette();
-        }
+        regeneratePalette();
     }
 });
 
 const downloadPalette = () => {
-    // Placeholder for download functionality
     alert('Download JPG functionality coming soon!');
 };
 
@@ -203,57 +142,43 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Ensure html, body, and the app root take full height */
-/* This might be better in a global style file if you have one, or in the Astro layout */
 :global(html),
 :global(body),
 :global(#app) {
-    /* Assuming your Astro root is #app or similar */
     height: 100%;
     margin: 0;
 }
 
 :global(#color-v-app) {
-    /* If #color-v-app is the direct child of body */
     min-height: 100vh;
 }
-
 
 #color-v-app {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* Changed from height to min-height for flexibility */
     background-color: #f8fafc;
-    /* bg-slate-50 */
 }
 
 header,
 nav {
     flex-shrink: 0;
-    /* Prevent header and nav from shrinking */
 }
 
 main.palette-grid {
     flex-grow: 1;
-    /* Allow main to grow and fill available space */
     display: grid;
-    /* Mobile: 5 rows, 1 column */
     grid-template-columns: 1fr;
     grid-template-rows: repeat(5, 1fr);
 }
 
-/* Desktop and Tablet: 5 columns, 1 row */
 @media (min-width: 640px) {
-
-    /* sm breakpoint in Tailwind */
     main.palette-grid {
         grid-template-columns: repeat(5, 1fr);
         grid-template-rows: 1fr;
     }
 }
 
-/* Styling for form elements to match Tailwind's aesthetic */
 .form-input,
 .form-select {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -262,8 +187,6 @@ main.palette-grid {
 .form-input:focus,
 .form-select:focus {
     border-color: #60a5fa;
-    /* focus:ring-blue-400 */
     box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25);
-    /* focus:ring-2 focus:ring-opacity-75 */
 }
 </style>
