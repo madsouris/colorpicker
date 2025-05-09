@@ -33,6 +33,7 @@
                             <label for="formulaSelect" class="text-xs text-slate-600 mb-1">Color formula</label>
                             <select id="formulaSelect" v-model="selectedFormula"
                                 class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
+                                <option value="random">Random</option>
                                 <option value="monochromatic">Monochromatic</option>
                                 <option value="analogous">Analogous</option>
                                 <option value="complementary">Complementary</option>
@@ -111,7 +112,8 @@ import { generatePalette, getContrastingTextColor, createPaletteSvg, hexToRgb } 
 
 const isWelcomeVisible = ref(true);
 const palette = ref([]);
-const selectedFormula = ref('monochromatic');
+// Default to 'random' formula
+const selectedFormula = ref('random');
 const handleStart = () => {
     isWelcomeVisible.value = false;
 };
@@ -123,19 +125,27 @@ function getRandomHexColor() {
 
 /**
  * Regenerate the color palette based on the selected formula.
+ * If 'Random' is selected, randomly pick a real formula each time.
  * Preserves locked colors and fills unlocked slots with new colors.
  */
 const regeneratePalette = () => {
     // Collect locked colors for all formulas
     const lockedColors = palette.value.map(color => color && color.locked ? color : null);
-    if (selectedFormula.value === 'analogous') {
+    // List of real formulas
+    const realFormulas = ['monochromatic', 'analogous', 'complementary', 'triadic'];
+    let formula = selectedFormula.value;
+    if (formula === 'random') {
+        // Pick one randomly
+        formula = realFormulas[Math.floor(Math.random() * realFormulas.length)];
+    }
+    if (formula === 'analogous') {
         palette.value = generateAnalogousPalette(getRandomHexColor(), 5, lockedColors);
-    } else if (selectedFormula.value === 'complementary') {
+    } else if (formula === 'complementary') {
         palette.value = generateComplementaryPalette(getRandomHexColor(), 5, lockedColors);
-    } else if (selectedFormula.value === 'triadic') {
+    } else if (formula === 'triadic') {
         palette.value = generateTriadicPalette(getRandomHexColor(), 5, lockedColors);
     } else {
-        palette.value = generatePalette(selectedFormula.value, null, lockedColors);
+        palette.value = generatePalette(formula, null, lockedColors);
     }
 };
 
