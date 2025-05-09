@@ -5,8 +5,8 @@
         <!-- Title Bar -->
         <header class="py-3 border-b border-slate-300 bg-white shadow-sm">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-2 items-center">
-                    <div>
+                <div class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center">
+                    <div class="lg:col-span-2">
                         <h1 class="text-2xl font-semibold text-slate-700 tracking-tight">
                             ColorPalette.Gen
                         </h1>
@@ -15,8 +15,21 @@
                         </p>
                     </div>
                     <div class="text-right">
-                        <div class="inline-block bg-slate-200 px-4 py-2 text-xs text-slate-500 rounded">
-                            Ads Space
+                        <div class="flex items-center border border-blue-600 bg-white rounded-lg  px-4 py-2 gap-4 text-left grow-0">
+                            <img src="/souris.JPG" alt="Ad" class="w-20 h-20 rounded object-cover " />
+                            <div class="flex flex-col justify-center">
+                                <h3 class="text-base font-semibold text-slate-700 leading-tight">
+                                    Hire a Design Partner!
+                                </h3>
+
+                                <p class="text-xs text-slate-500 mb-2">
+                                    Available for your next big ideas. High-quality visuals on subscription. 
+                                </p>
+
+                                <a href="//design.vannrith.com" rel="nofollow" class="text-xs font-medium text-blue-600 uppercase tracking-tight ">
+                                    See Plans
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -26,13 +39,13 @@
         <!-- Control Bar -->
         <nav class="py-4 border-b border-slate-300 bg-slate-50">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                    <div class="flex flex-wrap gap-2 items-end">
-                        <!-- Starting point input removed for simpler UX -->
+                <div class="flex items-end gap-2 w-full">
+                    <!-- Controls group: selector, regenerate, reset -->
+                    <div class="flex flex-row gap-2 items-end flex-shrink-0">
                         <div class="flex flex-col">
-                            <label for="formulaSelect" class="text-xs text-slate-600 mb-1">Color formula</label>
+                            <label for="formulaSelect" class="text-xs text-slate-600 mb-1">Color Formula</label>
                             <select id="formulaSelect" v-model="selectedFormula"
-                                class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
+                                class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm cursor-pointer">
                                 <option value="random">Random</option>
                                 <option value="monochromatic">Monochromatic</option>
                                 <option value="analogous">Analogous</option>
@@ -42,10 +55,8 @@
                         </div>
                         <button @click="regeneratePalette()"
                             class="bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" fill="currentColor">
+                                <path d="m320 192l-85.333-32L320 127.968l32-85.301l32.03 85.301L469.333 160l-85.303 32L352 277.333zM149.333 362.667L42.667 320l106.666-42.667L192 170.667l42.667 106.666L341.333 320l-106.666 42.667L192 469.333z"/>
                             </svg>
                             <span class="hidden md:inline">Regenerate</span>
                         </button>
@@ -53,32 +64,31 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                            Reset
+                            <span class="hidden md:inline">Reset</span>
                         </button>
                     </div>
-                    <div class="flex justify-start md:justify-end items-end">
-                        <button @click="downloadPalette"
-                            class="bg-gradient-to-b from-zinc-50 to-zinc-100 hover:from-zinc-100 hover:to-zinc-200 active:from-zinc-200 active:to-zinc-300 text-zinc-800 font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2 border border-zinc-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            <span class="hidden md:inline">Download SVG</span>
-                        </button>
-                    </div>
+                    <!-- Download button pushed to end -->
+                    <button @click="downloadPalette"
+                        class="ml-auto bg-gradient-to-b from-zinc-50 to-zinc-100 hover:from-zinc-100 hover:to-zinc-200 active:from-zinc-200 active:to-zinc-300 text-zinc-800 font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2 border border-zinc-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span class="hidden md:inline">Download SVG</span>
+                    </button>
                 </div>
             </div>
         </nav>
 
         <!-- Palette Display Area -->
-        <main class="flex-grow grid palette-grid overflow-hidden">
+        <main class="flex-grow grid grid-cols-1 md:grid-cols-5 overflow-hidden">
             <div v-if="palette.length > 0" v-for="(color, index) in palette" :key="index"
                 :style="{ backgroundColor: color.hex, color: getContrastingTextColor(color.hex) }"
                 class="flex flex-row md:flex-col gap-8 justify-between items-center md:justify-center md:items-center text-center p-4 relative">
 
                 <!-- Color Codes -->
-                <div class=" flex flex-col gap-2 text-left md:text-center items-start md:items-center">
+                <div class=" flex flex-col gap-0 md:gap-2 text-left md:text-center items-start md:items-center">
                     <p @click="(event) => copyToClipboard(color.hex, event)"
                         class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer uppercase tracking-tight p-2 bg-transparent hover:bg-white/10 rounded-lg">
                         {{ color.hex }}
@@ -475,19 +485,6 @@ nav {
     flex-shrink: 0;
 }
 
-main.palette-grid {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(5, 1fr);
-}
-
-@media (min-width: 640px) {
-    main.palette-grid {
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: 1fr;
-    }
-}
 
 .form-input,
 .form-select {
