@@ -49,6 +49,12 @@
                             </svg>
                             <span class="hidden md:inline">Regenerate</span>
                         </button>
+                        <button @click="resetPalette" class="text-blue-600 hover:text-blue-800 font-medium py-2 px-2 rounded flex items-center gap-1 text-sm focus:outline-none cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset
+                        </button>
                     </div>
                     <div class="flex justify-start md:justify-end items-end">
                         <button @click="downloadPalette"
@@ -69,23 +75,23 @@
         <main class="flex-grow grid palette-grid overflow-hidden">
             <div v-if="palette.length > 0" v-for="(color, index) in palette" :key="index"
                 :style="{ backgroundColor: color.hex, color: getContrastingTextColor(color.hex) }"
-                class="flex flex-row md:flex-col gap-8 justify-between items-center md:justify-center md:items-center text-center p-4 relative cursor-pointer hover:opacity-90">
+                class="flex flex-row md:flex-col gap-8 justify-between items-center md:justify-center md:items-center text-center p-4 relative">
 
                 <!-- Color Codes -->
                 <div class=" flex flex-col gap-2 text-left md:text-center items-start md:items-center">
                     <p @click="(event) => copyToClipboard(color.hex, event)"
-                        class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer uppercase ">
+                        class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer uppercase tracking-tight p-2 bg-transparent hover:bg-white/10 rounded-lg">
                         {{ color.hex }}
                     </p>
                     <p @click="(event) => copyToClipboard(color.rgb, event)"
-                        class="font-mono text-xs sm:text-sm cursor-pointer uppercase">
+                        class="font-mono tracking-tight text-xs sm:text-sm cursor-pointer uppercase p-2 bg-transparent hover:bg-white/10 rounded-lg">
                         {{ color.rgb }}
                     </p>
                 </div>
 
                 <!-- Lock/Unlock Button -->
                 <button @click="toggleLock(index)"
-                    class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer">
+                    :class="['p-2 rounded-full transition-colors cursor-pointer', color.locked ? 'bg-white/20 hover:bg-white/30' : '']">
                     <svg v-if="color.locked" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,6 +120,17 @@ const isWelcomeVisible = ref(true);
 const palette = ref([]);
 // Default to 'random' formula
 const selectedFormula = ref('random');
+
+/**
+ * Reset the palette: set formula to random, unlock all colors, and regenerate.
+ */
+function resetPalette() {
+    selectedFormula.value = 'random';
+    // Unlock all colors
+    palette.value = palette.value.map(color => ({ ...color, locked: false }));
+    regeneratePalette();
+}
+
 const handleStart = () => {
     isWelcomeVisible.value = false;
 };
@@ -421,6 +438,7 @@ watch(isWelcomeVisible, (newValue) => {
 });
 
 onMounted(() => {
+    document.title = 'ColorPalette.Gen'; // Set webpage title
     regeneratePalette(); // Generate initial random palette
     if (!isWelcomeVisible.value) {
         window.addEventListener('keydown', handleKeyPress);
