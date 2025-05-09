@@ -68,11 +68,23 @@
         <main class="flex-grow grid palette-grid overflow-hidden">
             <div v-if="palette.length > 0" v-for="(color, index) in palette" :key="index"
                 :style="{ backgroundColor: color.hex, color: getContrastingTextColor(color.hex) }"
-                class="flex flex-col justify-center items-center text-center p-4 relative">
+                class="flex flex-row md:flex-col gap-8 justify-between items-center md:justify-center md:items-center text-center p-4 relative cursor-pointer hover:opacity-90">
+
+                <!-- Color Codes -->
+                <div class=" flex flex-col gap-2 text-left md:text-center items-start md:items-center">
+                    <p @click="(event) => copyToClipboard(color.hex, event)"
+                        class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer ">
+                        {{ color.hex }}
+                    </p>
+                    <p @click="(event) => copyToClipboard(color.rgb, event)"
+                        class="font-mono text-xs sm:text-sm cursor-pointer uppercase">
+                        {{ color.rgb }}
+                    </p>
+                </div>
 
                 <!-- Lock/Unlock Button -->
                 <button @click="toggleLock(index)"
-                    class="absolute top-2 right-2 p-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+                    class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer">
                     <svg v-if="color.locked" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,18 +96,6 @@
                             d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                     </svg>
                 </button>
-
-                <!-- Color Codes -->
-                <p @click="copyToClipboard(color.hex)"
-                    class="font-mono font-bold text-sm sm:text-base cursor-pointer hover:underline">
-                    {{ color.hex }}
-                    <span class="copy-tooltip">Click to copy</span>
-                </p>
-                <p @click="copyToClipboard(color.rgb)"
-                    class="font-mono text-xs sm:text-sm cursor-pointer hover:underline">
-                    {{ color.rgb }}
-                    <span class="copy-tooltip">Click to copy</span>
-                </p>
             </div>
             <div v-else class="col-span-full flex items-center justify-center text-slate-600 p-10">
                 <p>Generating your palette...</p>
@@ -130,14 +130,37 @@ const toggleLock = (index) => {
     }
 };
 
-const copyToClipboard = (text) => {
+// Track original text values for elements being copied
+const originalTexts = ref({});
+
+const copyToClipboard = (text, event) => {
+    // Get the element that was clicked
+    const element = event.currentTarget;
+    const isHex = text.startsWith('#');
+    const feedbackText = isHex ? 'HEX copied!' : 'RGB copied!';
+
+    // Store the original text if not already stored
+    if (!originalTexts.value[text]) {
+        originalTexts.value[text] = element.textContent.trim();
+    }
+
+    // Update the element text to show feedback
+    element.textContent = feedbackText;
+
+    // Copy to clipboard
     navigator.clipboard.writeText(text)
         .then(() => {
-            // Could add a toast notification here
             console.log('Copied to clipboard:', text);
+
+            // Revert back to original text after 1 second
+            setTimeout(() => {
+                element.textContent = originalTexts.value[text];
+            }, 1000);
         })
         .catch(err => {
             console.error('Failed to copy:', err);
+            // Revert back immediately on error
+            element.textContent = originalTexts.value[text];
         });
 };
 
