@@ -34,9 +34,9 @@
                             <select id="formulaSelect" v-model="selectedFormula"
                                 class="form-select px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm">
                                 <option value="monochromatic">Monochromatic</option>
-                                <option value="analogous" disabled>Analogous</option>
-                                <option value="complementary" disabled>Complementary</option>
-                                <option value="triadic" disabled>Triadic</option>
+                                <option value="analogous">Analogous</option>
+                                <option value="complementary">Complementary</option>
+                                <option value="triadic">Triadic</option>
                             </select>
                         </div>
                         <button @click="regeneratePalette()"
@@ -73,7 +73,7 @@
                 <!-- Color Codes -->
                 <div class=" flex flex-col gap-2 text-left md:text-center items-start md:items-center">
                     <p @click="(event) => copyToClipboard(color.hex, event)"
-                        class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer ">
+                        class="font-mono font-bold text-sm sm:text-base lg:text-3xl cursor-pointer uppercase ">
                         {{ color.hex }}
                     </p>
                     <p @click="(event) => copyToClipboard(color.rgb, event)"
@@ -116,13 +116,222 @@ const handleStart = () => {
     isWelcomeVisible.value = false;
 };
 
-const regeneratePalette = () => {
-    // Collect locked colors
-    const lockedColors = palette.value.map(color => color.locked ? color : null);
+function getRandomHexColor() {
+    const hex = '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+    return hex;
+}
 
-    // Generate the palette with random base color
-    palette.value = generatePalette(selectedFormula.value, null, lockedColors);
+/**
+ * Regenerate the color palette based on the selected formula.
+ * Preserves locked colors and fills unlocked slots with new colors.
+ */
+const regeneratePalette = () => {
+    // Collect locked colors for all formulas
+    const lockedColors = palette.value.map(color => color && color.locked ? color : null);
+    if (selectedFormula.value === 'analogous') {
+        palette.value = generateAnalogousPalette(getRandomHexColor(), 5, lockedColors);
+    } else if (selectedFormula.value === 'complementary') {
+        palette.value = generateComplementaryPalette(getRandomHexColor(), 5, lockedColors);
+    } else if (selectedFormula.value === 'triadic') {
+        palette.value = generateTriadicPalette(getRandomHexColor(), 5, lockedColors);
+    } else {
+        palette.value = generatePalette(selectedFormula.value, null, lockedColors);
+    }
 };
+
+// Generate analogous palette
+/**
+ * Generate an analogous color palette (colors next to each other on the color wheel).
+ * @param {string} hex - Base hex color.
+ * @param {number} count - Number of colors in palette.
+ * @param {Array} lockedColors - Array of locked color objects or nulls.
+ * @returns {Array} Array of color objects.
+ */
+function generateAnalogousPalette(hex, count = 5, lockedColors = []) {
+    // Convert hex to HSL
+    const hsl = hexToHSL(hex);
+    const colors = [];
+    // Center color
+    const center = Math.floor(count / 2);
+    for (let i = 0; i < count; i++) {
+        if (lockedColors && lockedColors[i]) {
+            colors.push(lockedColors[i]);
+        } else {
+            const offset = (i - center) * 30; // 30 degree step
+            let hue = (hsl.h + offset + 360) % 360;
+            const colorHex = hslToHex(hue, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({
+                hex: colorHex,
+                rgb: rgbStr,
+                hsl: { h: hue, s: hsl.s, l: hsl.l },
+                locked: false
+            });
+        }
+    }
+    return colors;
+}
+
+// Generate triadic palette
+/**
+ * Generate a triadic color palette (three colors 120° apart).
+ * @param {string} hex - Base hex color.
+ * @param {number} count - Number of colors in palette.
+ * @param {Array} lockedColors - Array of locked color objects or nulls.
+ * @returns {Array} Array of color objects.
+ */
+function generateTriadicPalette(hex, count = 5, lockedColors = []) {
+    const hsl = hexToHSL(hex);
+    const triad1 = hsl.h;
+    const triad2 = (hsl.h + 120) % 360;
+    const triad3 = (hsl.h + 240) % 360;
+    const colors = [];
+    // We'll use base color, two triad colors, and tints/shades for the rest
+    // Place base at center, triad2 and triad3 at left/right, rest are tints/shades
+    // Example order: [tint, triad2, base, triad3, shade]
+    const slots = [0, 1, 2, 3, 4];
+    const baseIdx = 2;
+    const triad2Idx = 1;
+    const triad3Idx = 3;
+    for (let i = 0; i < count; i++) {
+        if (lockedColors && lockedColors[i]) {
+            colors.push(lockedColors[i]);
+        } else if (i === baseIdx) {
+            const colorHex = hslToHex(triad1, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: triad1, s: hsl.s, l: hsl.l }, locked: false });
+        } else if (i === triad2Idx) {
+            const colorHex = hslToHex(triad2, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: triad2, s: hsl.s, l: hsl.l }, locked: false });
+        } else if (i === triad3Idx) {
+            const colorHex = hslToHex(triad3, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: triad3, s: hsl.s, l: hsl.l }, locked: false });
+        } else {
+            // Fill with tints and shades of base
+            let lMod = (i < baseIdx) ? 15 * (baseIdx - i) : -15 * (i - baseIdx);
+            let useL = Math.max(0, Math.min(100, hsl.l + lMod));
+            const colorHex = hslToHex(triad1, hsl.s, useL);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: triad1, s: hsl.s, l: useL }, locked: false });
+        }
+    }
+    return colors;
+}
+
+// Generate complementary palette
+/**
+ * Generate a complementary color palette (base + opposite on color wheel).
+ * @param {string} hex - Base hex color.
+ * @param {number} count - Number of colors in palette.
+ * @param {Array} lockedColors - Array of locked color objects or nulls.
+ * @returns {Array} Array of color objects.
+ */
+function generateComplementaryPalette(hex, count = 5, lockedColors = []) {
+    const hsl = hexToHSL(hex);
+    const compHue = (hsl.h + 180) % 360;
+    const colors = [];
+    // We'll use base color, complementary, and tints/shades for the rest
+    // Place base at center, complementary at next slot, rest are tints/shades
+    const slots = [0, 1, 2, 3, 4];
+    const baseIdx = 2; // center
+    const compIdx = 3; // next to center
+    for (let i = 0; i < count; i++) {
+        if (lockedColors && lockedColors[i]) {
+            colors.push(lockedColors[i]);
+        } else if (i === baseIdx) {
+            const colorHex = hslToHex(hsl.h, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { ...hsl }, locked: false });
+        } else if (i === compIdx) {
+            const colorHex = hslToHex(compHue, hsl.s, hsl.l);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: compHue, s: hsl.s, l: hsl.l }, locked: false });
+        } else {
+            // Fill with tints and shades of base and complementary
+            // For simplicity, alternate lighter/darker versions
+            let lMod = 0;
+            if (i < baseIdx) lMod = 15 * (baseIdx - i); // lighter
+            else if (i > compIdx) lMod = -15 * (i - compIdx); // darker
+            let useHue = (i < baseIdx) ? hsl.h : compHue;
+            let useL = Math.max(0, Math.min(100, hsl.l + lMod));
+            const colorHex = hslToHex(useHue, hsl.s, useL);
+            const rgbObj = hexToRgb(colorHex);
+            const rgbStr = rgbObj ? `rgb(${rgbObj.r},${rgbObj.g},${rgbObj.b})` : '';
+            colors.push({ hex: colorHex, rgb: rgbStr, hsl: { h: useHue, s: hsl.s, l: useL }, locked: false });
+        }
+    }
+    return colors;
+}
+
+// Helpers: hexToHSL and hslToHex
+function hexToHSL(H) {
+    // Convert hex to RGB first
+    let r = 0, g = 0, b = 0;
+    if (H.length == 4) {
+        r = "0x" + H[1] + H[1];
+        g = "0x" + H[2] + H[2];
+        b = "0x" + H[3] + H[3];
+    } else if (H.length == 7) {
+        r = "0x" + H[1] + H[2];
+        g = "0x" + H[3] + H[4];
+        b = "0x" + H[5] + H[6];
+    }
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin;
+    let h = 0, s = 0, l = 0;
+    if (delta === 0)
+        h = 0;
+    else if (cmax === r)
+        h = ((g - b) / delta) % 6;
+    else if (cmax === g)
+        h = (b - r) / delta + 2;
+    else
+        h = (r - g) / delta + 4;
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+    l = (cmax + cmin) / 2;
+    s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+    s = +(s * 100).toFixed(1);
+    l = +(l * 100).toFixed(1);
+    return { h, s, l };
+}
+
+function hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+    let c = (1 - Math.abs(2 * l - 1)) * s,
+        x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+        m = l - c/2,
+        r = 0, g = 0, b = 0;
+    if (0 <= h && h < 60) {
+        r = c; g = x; b = 0;
+    } else if (60 <= h && h < 120) {
+        r = x; g = c; b = 0;
+    } else if (120 <= h && h < 180) {
+        r = 0; g = c; b = x;
+    } else if (180 <= h && h < 240) {
+        r = 0; g = x; b = c;
+    } else if (240 <= h && h < 300) {
+        r = x; g = 0; b = c;
+    } else if (300 <= h && h < 360) {
+        r = c; g = 0; b = x;
+    }
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 
 const toggleLock = (index) => {
     if (palette.value[index]) {

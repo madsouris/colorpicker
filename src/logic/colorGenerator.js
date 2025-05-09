@@ -1,6 +1,11 @@
 // colorGenerator.js
 // Core color utility functions
 
+/**
+ * Convert a hex color string to an RGB object.
+ * @param {string} hex - Hex color string (e.g. '#ff00ff')
+ * @returns {{r:number,g:number,b:number}|null} RGB object or null if invalid.
+ */
 export function hexToRgb(hex) {
   if (!hex) return null;
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -17,6 +22,13 @@ export function hexToRgb(hex) {
 }
 
 // Convert RGB to HSL
+/**
+ * Convert RGB values to HSL.
+ * @param {number} r - Red (0-255)
+ * @param {number} g - Green (0-255)
+ * @param {number} b - Blue (0-255)
+ * @returns {[number, number, number]} Array of [h, s, l] where h (0-360), s/l (0-100)
+ */
 export function rgbToHsl(r, g, b) {
   r /= 255;
   g /= 255;
