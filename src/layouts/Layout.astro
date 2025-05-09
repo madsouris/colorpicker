@@ -1,56 +1,60 @@
 ---
-import { pwaInfo } from "virtual:pwa-info";
+import '../styles/global.css'
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" sizes="180x180" />
-    <link rel="mask-icon" href="/favicon.svg" color="#FFFFFF" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Color Picker</title>
-    <meta name="theme-color" content="#FFFFFF" />
-    <meta name="title" content="Color Picker by @madsouris" />
-    <meta
-      name="description"
-      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
-    />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="ColorPalette.Gen is a modern color palette generator for designers and developers. Instantly create, lock, and explore beautiful color schemes using advanced color theory formulas." />
+		<meta name="keywords" content="color palette generator, color schemes, color picker, color tool, design tools, UI colors, color theory, complementary, triadic, analogous, monochromatic, rgb, hex, creative, web design, graphic design" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://color.vannrith.com/" />
-    <meta property="og:title" content="Color Picker by @madsouris" />
-    <meta
-      property="og:description"
-      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
-    />
-    <meta property="og:image" content="/color.png" />
+		<!-- Open Graph / Facebook -->
+		<meta property="og:title" content="ColorPalette.Gen – Modern Color Palette Generator" />
+		<meta property="og:description" content="Instantly generate, lock, and explore beautiful color palettes for your next project. Powered by color theory and a beautiful UI." />
+		<meta property="og:image" content="/feature.jpg" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://color.vannrith.com/" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://color.vannrith.com/" />
-    <meta property="twitter:title" content="Color Picker by @madsouris" />
-    <meta
-      property="twitter:description"
-      content="These colors are from the old Google Material Design Color Guideline. Source code is available on Github."
-    />
-    <meta property="twitter:image" content="/color.png" />
-
-    {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
-  </head>
-  <body>
-    <slot />
-  </body>
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="ColorPalette.Gen – Modern Color Palette Generator" />
+		<meta name="twitter:description" content="Instantly generate, lock, and explore beautiful color palettes for your next project. Powered by color theory and a beautiful UI." />
+		<meta name="twitter:image" content="/feature.jpg" />
+	</head>
+	<body class="bg-slate-200 text-slate-800"> {/* Changed background and text for better base contrast */}
+		<slot />
+	</body>
 </html>
+<style is:global>
+	/* Optional: Add any global styles here if needed, beyond Tailwind */
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Classic macOS font stack */
+	}
 
-<style>
-  body,
-  html {
-    background: url("/bg.svg");
-    background-size: cover;
-    background-attachment: fixed;
-  }
+	/* Adding a subtle pattern can sometimes enhance the old-school feel, optional */
+	/*
+	body::before {
+		content: "";
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+		background-size: 20px 20px;
+		z-index: -1;
+		opacity: 0.5;
+	}
+	*/
 </style>
