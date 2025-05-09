@@ -12,11 +12,25 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="color.v - Generate beautiful color palettes" />
+		<meta name="description" content="ColorPalette.Gen is a modern color palette generator for designers and developers. Instantly create, lock, and explore beautiful color schemes using advanced color theory formulas." />
+		<meta name="keywords" content="color palette generator, color schemes, color picker, color tool, design tools, UI colors, color theory, complementary, triadic, analogous, monochromatic, rgb, hex, creative, web design, graphic design" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:title" content="ColorPalette.Gen – Modern Color Palette Generator" />
+		<meta property="og:description" content="Instantly generate, lock, and explore beautiful color palettes for your next project. Powered by color theory and a beautiful UI." />
+		<meta property="og:image" content="/feature.jpg" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://color.vannrith.com/" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="ColorPalette.Gen – Modern Color Palette Generator" />
+		<meta name="twitter:description" content="Instantly generate, lock, and explore beautiful color palettes for your next project. Powered by color theory and a beautiful UI." />
+		<meta name="twitter:image" content="/feature.jpg" />
 	</head>
 	<body class="bg-slate-200 text-slate-800"> {/* Changed background and text for better base contrast */}
 		<slot />
