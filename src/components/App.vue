@@ -26,17 +26,9 @@
         <!-- Control Bar -->
         <nav class="py-4 border-b border-slate-300 bg-slate-50">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <div class="flex flex-wrap gap-2 items-center">
-                        <div class="flex flex-col">
-                            <label for="baseColorInput" class="text-xs text-slate-600 mb-1">Starting point</label>
-                            <div
-                                class="flex items-center form-input w-auto h-9 px-3 py-2 border border-slate-300 rounded-md shadow-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent cursor-pointer">
-                                <span class="font-mono text-sm mr-2">{{ baseHexColor }}</span>
-                                <input id="baseColorInput" type="color" v-model="baseHexColor"
-                                    class="w-6 h-6 border-0 p-0 m-0 cursor-pointer" />
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                    <div class="flex flex-wrap gap-2 items-end">
+                        <!-- Starting point input removed for simpler UX -->
                         <div class="flex flex-col">
                             <label for="formulaSelect" class="text-xs text-slate-600 mb-1">Color formula</label>
                             <select id="formulaSelect" v-model="selectedFormula"
@@ -47,7 +39,7 @@
                                 <option value="triadic" disabled>Triadic</option>
                             </select>
                         </div>
-                        <button @click="regeneratePalette(true)"
+                        <button @click="regeneratePalette()"
                             class="bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -57,7 +49,7 @@
                             <span class="hidden md:inline">Regenerate</span>
                         </button>
                     </div>
-                    <div class="flex justify-start md:justify-end">
+                    <div class="flex justify-start md:justify-end items-end">
                         <button @click="downloadPalette"
                             class="bg-gradient-to-b from-zinc-50 to-zinc-100 hover:from-zinc-100 hover:to-zinc-200 active:from-zinc-200 active:to-zinc-300 text-zinc-800 font-medium py-2 px-4 md:px-6 rounded-full shadow-md hover:shadow-lg active:shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-opacity-75 transition-all duration-150 ease-in-out cursor-pointer text-sm flex items-center gap-2 border border-zinc-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -119,31 +111,17 @@ import { generatePalette, getContrastingTextColor, createPaletteSvg, hexToRgb } 
 
 const isWelcomeVisible = ref(true);
 const palette = ref([]);
-const baseHexColor = ref('');
 const selectedFormula = ref('monochromatic');
 const handleStart = () => {
     isWelcomeVisible.value = false;
 };
 
-const regeneratePalette = (useRandomBase = false) => {
+const regeneratePalette = () => {
     // Collect locked colors
     const lockedColors = palette.value.map(color => color.locked ? color : null);
 
-    // Generate new palette with locked colors preserved
-    let baseColor = null;
-
-    // If we're not forcing random and we have a valid hex color, use it as base
-    if (!useRandomBase && baseHexColor.value && /^#[0-9A-F]{6}$/i.test(baseHexColor.value)) {
-        baseColor = hexToRgb(baseHexColor.value);
-    }
-
-    // Generate the palette
-    palette.value = generatePalette(selectedFormula.value, baseColor, lockedColors);
-
-    // Update the base color input with the first color if it's not locked
-    if (palette.value.length > 0 && !lockedColors[0]) {
-        baseHexColor.value = palette.value[0].hex;
-    }
+    // Generate the palette with random base color
+    palette.value = generatePalette(selectedFormula.value, null, lockedColors);
 };
 
 const toggleLock = (index) => {
@@ -163,11 +141,7 @@ const copyToClipboard = (text) => {
         });
 };
 
-watch(baseHexColor, (newValue) => {
-    if (newValue && /^#[0-9A-F]{6}$/i.test(newValue)) {
-        regeneratePalette(false);
-    }
-});
+// Base color watch removed as we no longer have a base color input
 
 const downloadPalette = () => {
     // Create SVG content
@@ -192,7 +166,7 @@ const downloadPalette = () => {
 const handleKeyPress = (event) => {
     if (!isWelcomeVisible.value && event.code === 'Space' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'SELECT') {
         event.preventDefault();
-        regeneratePalette(true);
+        regeneratePalette();
     }
 };
 
@@ -205,7 +179,7 @@ watch(isWelcomeVisible, (newValue) => {
 });
 
 onMounted(() => {
-    regeneratePalette(true); // Generate initial random palette
+    regeneratePalette(); // Generate initial random palette
     if (!isWelcomeVisible.value) {
         window.addEventListener('keydown', handleKeyPress);
     }
